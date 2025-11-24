@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trade-In Sniper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- iPhone app-style settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Trade-In Sniper" />
+
+  <style>
+    :root {
+      --bg: #050509;
+      --card: #111218;
+      --accent-apple: #ffffff;
+      --accent-eco: #00b86b;
+      --accent-gs: #e31221;
+      --text-main: #f7f7ff;
+      --text-muted: #9a9fb5;
+      --border-subtle: #262738;
+      --radius: 16px;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
+      background: radial-gradient(circle at top, #1b1f33 0, #050509 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px 16px 24px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #171827, #0b0c12);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .pill {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+      background: rgba(10, 10, 18, 0.8);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .mode-btn {
+      border-radius: 999px;
+      padding: 8px 4px;
+      font-size: 11px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .mode-btn.active {
+      color: #050509;
+      background: #ffffff;
+    }
+    .mode-btn[data-mode="apple"].active {
+      background: var(--accent-apple);
+    }
+    .mode-btn[data-mode="eco"].active {
+      background: var(--accent-eco);
+    }
+    .mode-btn[data-mode="gs"].active {
+      background: var(--accent-gs);
+    }
+
+    .card {
+      background: rgba(9, 10, 16, 0.95);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 14px 10px;
+      margin-bottom: 12px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    select,
+    input {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 8px 11px;
+      font-size: 12px;
+      margin-bottom: 8px;
+      background: #070812;
+      color: var(--text-main);
+    }
+    input::placeholder {
+      color: #5d6275;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 4px;
+    }
+    .price-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .price-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .targets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .target-chip {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 6px 4px;
+      text-align: left;
+    }
+    .target-label {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+    .target-value {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div>
+        <div class="title">Trade-In Sniper</div>
+        <div class="subtitle">Triple Mode • Apple • ecoATM • GameStop</div>
+      </div>
+      <div class="pill">DFW ▸ Ikeja • Pro</div>
+    </header>
+
+    <!-- Mode switcher -->
+    <div class="mode-switch">
+      <button class="mode-btn active" data-mode="apple" onclick="setMode('apple')">
+         Apple
+      </button>
+      <button class="mode-btn" data-mode="eco" onclick="setMode('eco')">
+        ecoATM
+      </button>
+      <button class="mode-btn" data-mode="gs" onclick="setMode('gs')">
+        GameStop
+      </button>
+    </div>
+
+    <!-- Device selector -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Device setup</div>
+        <div class="badge">Step 1 • Input device</div>
+      </div>
+
+      <label>Family</label>
+      <select id="family">
+        <option>iPhone</option>
+        <option>iPad</option>
+        <option>MacBook</option>
+        <option>Apple Watch</option>
+        <option>Samsung</option>
+        <option>Console</option>
+        <option>Other</option>
+      </select>
+
+      <label>Model (type exactly as listing)</label>
+      <input id="model" type="text" placeholder="e.g. iPhone 14 Pro Max" />
+
+      <label>Storage</label>
+      <select id="storage">
+        <option>64 GB</option>
+        <option>128 GB</option>
+        <option>256 GB</option>
+        <option>512 GB</option>
+        <option>1 TB</option>
+        <option>Other</option>
+      </select>
+
+      <label>Condition (your grading)</label>
+      <select id="condition">
+        <option>Grade A – Clean / Ready</option>
+        <option>Grade B – Light wear</option>
+        <option>Grade C – Heavy wear</option>
+        <option>Grade D – Cracked / Parts</option>
+        <option>Locked / FMI ON / Bad ESN</option>
+      </select>
+      <div class="hint">
+        Use your own grading + photos. This app just helps you think like a
+        corporate buyer.
+      </div>
+    </div>
+
+    <!-- Mode-specific pricing card -->
+    <div class="card" id="price-card">
+      <div class="card-header">
+        <div class="card-title" id="price-title"> Apple trade-in zone</div>
+        <div class="badge">Step 2 • Copy prices in</div>
+      </div>
+
+      <label id="baseline-label">Apple trade-in value (USD)</label>
+      <input
+        id="baseline"
+        type="number"
+        placeholder="e.g. 430"
+        inputmode="decimal"
+        oninput="recalc()"
+      />
+
+      <label>Seller asking price (listing)</label>
+      <input
+        id="ask"
+        type="number"
+        placeholder="e.g. 350"
+        inputmode="decimal"
+        oninput="recalc()"
+      />
+
+      <div class="price-row">
+        <div class="price-label">Instant spread (baseline − ask)</div>
+        <div class="price-value" id="spread">$0</div>
+      </div>
+
+      <div class="targets">
+        <div class="target-chip">
+          <div class="target-label">Safe sniper buy</div>
+          <div class="target-value" id="t-safe">$0</div>
+        </div>
+        <div class="target-chip">
+          <div class="target-label">Aggressive buy</div>
+          <div class="target-value" id="t-agg">$0</div>
+        </div>
+        <div class="target-chip">
+          <div class="target-label">Nigeria / export max</div>
+          <div class="target-value" id="t-max">$0</div>
+        </div>
+      </div>
+
+      <div class="hint" id="hint-text">
+        Apple mode: baseline = Apple trade-in price. Stay at or below the Safe
+        sniper line for easy flips.
+      </div>
+    </div>
+
+    <!-- Exit strategy helper -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Exit strategy</div>
+        <div class="badge">Step 3 • Where is the money?</div>
+      </div>
+
+      <div class="hint">
+        • Under ecoATM price ⇒ kiosk flip<br />
+        • Under GameStop cash / credit ⇒ store flip<br />
+        • Under Apple trade-in ⇒ Apple flip / upgrade<br />
+        • Good margin vs Nigeria sheet ⇒ Friday export
+      </div>
+    </div>
+
+    <div class="footer">
+      Trade-In Sniper • Built for Michel • Add to Home Screen on iPhone for
+      full-screen app.
+    </div>
+  </div>
+
+  <script>
+    let currentMode = "apple";
+
+    function setMode(mode) {
+      currentMode = mode;
+
+      document
+        .querySelectorAll(".mode-btn")
+        .forEach((btn) => btn.classList.remove("active"));
+      document
+        .querySelector('.mode-btn[data-mode="' + mode + '"]')
+        .classList.add("active");
+
+      const title = document.getElementById("price-title");
+      const baselineLabel = document.getElementById("baseline-label");
+      const hint = document.getElementById("hint-text");
+
+      if (mode === "apple") {
+        title.textContent = " Apple trade-in zone";
+        baselineLabel.textContent = "Apple trade-in value (USD)";
+        hint.textContent =
+          "Apple mode: baseline = Apple trade-in price. Stay at or below the Safe sniper line for easy flips.";
+      } else if (mode === "eco") {
+        title.textContent = "ecoATM instant-cash zone";
+        baselineLabel.textContent = "ecoATM offer (USD)";
+        hint.textContent =
+          "ecoATM mode: baseline = kiosk instant cash offer. Anything safely below this is almost risk-free.";
+      } else if (mode === "gs") {
+        title.textContent = "GameStop trade-in zone";
+        baselineLabel.textContent = "GameStop cash / credit (USD)";
+        hint.textContent =
+          "GameStop mode: baseline = store trade-in. Use Safe sniper for quick in-store flips.";
+      }
+      recalc();
+    }
+
+    function recalc() {
+      const baseline = parseFloat(document.getElementById("baseline").value) || 0;
+      const ask = parseFloat(document.getElementById("ask").value) || 0;
+      const spread = baseline - ask;
+
+      document.getElementById("spread").textContent =
+        "$" + spread.toFixed(0);
+
+      // Safe sniper = 70% of baseline
+      const safe = baseline * 0.7;
+      // Aggressive = 80% of baseline
+      const agg = baseline * 0.8;
+      // Max (export / retail) = 90% of baseline
+      const max = baseline * 0.9;
+
+      document.getElementById("t-safe").textContent =
+        safe > 0 ? "$" + safe.toFixed(0) : "$0";
+      document.getElementById("t-agg").textContent =
+        agg > 0 ? "$" + agg.toFixed(0) : "$0";
+      document.getElementById("t-max").textContent =
+        max > 0 ? "$" + max.toFixed(0) : "$0";
+    }
+  </script>
+</body>
+</html>
